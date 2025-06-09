@@ -1,0 +1,25 @@
+; ad724_clock.pio
+; Simple clock output for AD724 colorburst
+; Generates a square wave on a single pin
+
+.program ad724_clock
+
+.wrap_target
+    set pins, 1 [0]   ; Set pin high
+    set pins, 0 [0]   ; Set pin low
+.wrap
+
+% c-sdk {
+#include "hardware/pio.h"
+// freq: desired output frequency (e.g. 4430000 for PAL, 3579545 for NTSC)
+void ad724_clock_init(PIO pio, uint sm, uint offset, uint pin, float freq) {
+    pio_gpio_init(pio, pin);
+    pio_sm_set_consecutive_pindirs(pio, sm, pin, 1, true);
+    pio_sm_config c = ad724_clock_program_get_default_config(offset);
+    sm_config_set_out_pins(&c, pin, 1);
+    sm_config_set_set_pins(&c, pin, 1);
+    sm_config_set_clkdiv(&c, (float) (125000000.0f / (freq * 2.0f)) );
+    pio_sm_init(pio, sm, offset, &c);
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
