@@ -37,13 +37,13 @@
 // --- PAL/NTSC: Defines de líneas y rangos de sincronía/border ---
 #if VIDEO_NTSC
 #define NTSC_TOTAL_LINES 524
-#define NTSC_FIELD_LINES 249 //era 269. 321 para 312pixeles de alto. 309 para 240 pero raro
+#define NTSC_FIELD_LINES 249 // era 269. 321 para 312pixeles de alto. 309 para 240 pero raro
 #define NTSC_VSYNC_START 1
 #define NTSC_VSYNC_END 6
 #define NTSC_VSYNC_SHORT_START 7
 #define NTSC_VSYNC_SHORT_END 9
 #define NTSC_BORDER_TOP_START 0
-#define NTSC_BORDER_TOP_END 0 // antes 38
+#define NTSC_BORDER_TOP_END 0        // antes 38
 #define NTSC_BORDER_BOTTOM_START 270 // antes 223
 #define NTSC_BORDER_BOTTOM_END 262
 #else
@@ -61,24 +61,23 @@
 
 #define HSYNC_TABLE_SIZE 32
 
-int width = 320;
-int height = 240;
+int screenWidth = 320;
+int screenHeight = 240;
 
 unsigned short hsync[HSYNC_TABLE_SIZE] = {
     HSLO, HSLO, HSHI, HSHI, HSHI, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-    0x00,BORD
-};
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, BORD};
 
 unsigned short border[HSYNC_TABLE_SIZE] = {
     HSLO, HSLO, HSHI, HSHI, HSHI, HSHI, BORD, // sync pulses + 1 borde izq
     BORD, BORD, BORD, BORD, BORD, BORD, BORD,
     BORD, BORD, BORD, BORD, BORD, BORD, BORD,
     BORD, BORD, BORD, BORD, BORD, BORD, BORD,
-    BORD, BORD, BORD,BORD // área de borde
+    BORD, BORD, BORD, BORD // área de borde
 };
 
 unsigned short vsync_ll[HSYNC_TABLE_SIZE] = {
@@ -112,7 +111,8 @@ unsigned char *screen_bitmap_next = NULL;
 unsigned char *screen_bitmap_a = NULL;
 unsigned char *screen_bitmap_b = NULL;
 
-void swap_bitmap(void) {
+void swap_video_buffer()
+{
     unsigned char *tmp = screen_bitmap;
     screen_bitmap = screen_bitmap_next;
     screen_bitmap_next = tmp;
@@ -156,7 +156,7 @@ int initialise_cvideo(void)
     );
 
     // Allocate double buffers
-    size_t bufsize = width * height;
+    size_t bufsize = screenWidth * screenHeight;
     screen_bitmap_a = malloc(bufsize);
     screen_bitmap_b = malloc(bufsize);
     screen_bitmap = screen_bitmap_a;
@@ -179,7 +179,7 @@ int initialise_cvideo(void)
         sm_data,
         dma_channel_1, // On DMA channel 1
         DMA_SIZE_8,    // Size of each transfer
-        width,         // The bitmap width
+        screenWidth,   // The bitmap screenWidth
         NULL           // But there is no DMA interrupt for the pixel data
     );
 
@@ -190,8 +190,8 @@ int initialise_cvideo(void)
     pio0_hw->inte0 = PIO_IRQ0_INTE_SM0_BITS; // Just for IRQ 0 (triggered by irq set 0 in PIO)
     irq_set_enabled(PIO0_IRQ_0, true);       // Enable it
 
-    set_border(0); // Set the border colour
-    cls(0);        // Clear the screen (front buffer)
+    set_border(0);                          // Set the border colour
+    clearScreen(0);                         // Clear the screen (front buffer)
     memset(screen_bitmap_next, 0, bufsize); // Clear the back buffer
 
     // Start the PIO state machines
@@ -212,27 +212,29 @@ int set_mode(int mode)
     switch (mode)
     { // Get the video mode
     case 1:
-        width = 320;           // Set screen width and
+        screenWidth = 320;     // Set screen screenWidth and
         dfreq = piofreq_1_320; // pixel dot frequency accordingly
         break;
     case 2:
-        width = 640;
+        screenWidth = 640;
         dfreq = piofreq_1_640;
         break;
     default:
-        width = 256;
+        screenWidth = 256;
         dfreq = piofreq_1_256;
         break;
     }
     // Free and reallocate both buffers if mode changes
-    if (screen_bitmap_a) free(screen_bitmap_a);
-    if (screen_bitmap_b) free(screen_bitmap_b);
-    size_t bufsize = width * height;
+    if (screen_bitmap_a)
+        free(screen_bitmap_a);
+    if (screen_bitmap_b)
+        free(screen_bitmap_b);
+    size_t bufsize = screenWidth * screenHeight;
     screen_bitmap_a = malloc(bufsize);
     screen_bitmap_b = malloc(bufsize);
     screen_bitmap = screen_bitmap_a;
     screen_bitmap_next = screen_bitmap_b;
-    cls(0);
+    clearScreen(0);
     memset(screen_bitmap_next, 0, bufsize);
 
     cvideo_configure_pio_dma( // Reconfigure the DMA
@@ -240,7 +242,7 @@ int set_mode(int mode)
         sm_data,
         dma_channel_1, // On DMA channel 1
         DMA_SIZE_8,    // Size of each transfer
-        width,         // The bitmap width
+        screenWidth,   // The bitmap screenWidth
         NULL           // But there is no DMA interrupt for the pixel data
     );
 
@@ -287,12 +289,12 @@ void wait_vblank(void)
 //
 void cvideo_pio_handler(void)
 {
-    if (bline >= height)
+    if (bline >= screenHeight)
     {
         bline = 0;
     }
-    dma_channel_set_read_addr(dma_channel_1, &screen_bitmap[width * bline++], true); // Line up the next block of pixels
-    hw_set_bits(&pio0->irq, 1u);                                              // Reset the IRQ
+    dma_channel_set_read_addr(dma_channel_1, &screen_bitmap[screenWidth * bline++], true); // Line up the next block of pixels
+    hw_set_bits(&pio0->irq, 1u);                                                           // Reset the IRQ
 }
 
 // The DMA interrupt handler
@@ -304,19 +306,29 @@ void cvideo_dma_handler(void)
     // NTSC "no entrelazado": 262 líneas por campo, sin media línea
     int field_line = vline;
     // VSYNC: 6 líneas de long sync, 3 de short sync (puedes ajustar si tu capturadora es muy exigente)
-    if (field_line >= NTSC_VSYNC_START && field_line <= NTSC_VSYNC_END) {
+    if (field_line >= NTSC_VSYNC_START && field_line <= NTSC_VSYNC_END)
+    {
         dma_channel_set_read_addr(dma_channel_0, vsync_ll, true);
-    } else if (field_line >= NTSC_VSYNC_SHORT_START && field_line <= NTSC_VSYNC_SHORT_END) {
+    }
+    else if (field_line >= NTSC_VSYNC_SHORT_START && field_line <= NTSC_VSYNC_SHORT_END)
+    {
         dma_channel_set_read_addr(dma_channel_0, vsync_ss, true);
-    } else if (field_line >= NTSC_BORDER_TOP_START && field_line <= NTSC_BORDER_TOP_END) {
+    }
+    else if (field_line >= NTSC_BORDER_TOP_START && field_line <= NTSC_BORDER_TOP_END)
+    {
         dma_channel_set_read_addr(dma_channel_0, border, true);
-    } else if (field_line >= NTSC_BORDER_BOTTOM_START && field_line <= NTSC_BORDER_BOTTOM_END) {
+    }
+    else if (field_line >= NTSC_BORDER_BOTTOM_START && field_line <= NTSC_BORDER_BOTTOM_END)
+    {
         dma_channel_set_read_addr(dma_channel_0, border, true);
-    } else {
+    }
+    else
+    {
         dma_channel_set_read_addr(dma_channel_0, hsync, true);
     }
     // Flip de campo y reset cada 262 líneas
-    if (vline++ >= NTSC_FIELD_LINES) {
+    if (vline++ >= NTSC_FIELD_LINES)
+    {
         vline = 1;
         ntsc_field ^= 1;
         vblank_count++;
@@ -383,4 +395,3 @@ void cvideo_configure_pio_dma(PIO pio, uint sm, uint dma_channel, uint transfer_
         irq_set_enabled(DMA_IRQ_0, true);
     }
 }
-

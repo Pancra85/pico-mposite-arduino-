@@ -14,4 +14,4 @@
 
 #include "config.h"
 
-extern unsigned char const sample_bitmap[192][256];
+

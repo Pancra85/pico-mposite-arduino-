@@ -12,36 +12,77 @@
 #pragma once
 
 
+#include <stdint.h>
 #include <stdbool.h>
 
 #define rgb(r,g,b) (((b&6)<<5)|(g<<3)|r)
 
-struct Line {
-    int  dx, dy, sx, sy, e, xp, yp, h;
-    bool quad;
-};
+extern const short sinLut[360];
+extern const short cosLut[360];
+extern const short sinTable[360];
+extern const short cosTable[360];
+extern const uint8_t sqrtLut[256];
+extern const int bayerMatrixMax;
+extern const int bayerMatrixSize;
+
+#define BAYER_MATRIX_SIZE 8
+extern const int bayerMatrix[BAYER_MATRIX_SIZE][BAYER_MATRIX_SIZE];
+extern const int bayerMatrixY[BAYER_MATRIX_SIZE];
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void cls(unsigned char c);
-void scroll_up(unsigned char c, int rows);
+void clearScreen(unsigned char c);
 
 void print_char(int x, int y, int c, unsigned char bc, unsigned char fc);
 void print_string(int x, int y, char *s, unsigned char bc, unsigned char fc);
 
-void plot(int x, int y, unsigned char c);
-void draw_line(int x1, int y1, int x2, int y2, unsigned char c);
-void draw_horizontal_line(int y1, int x1, int x2, int c);
-void draw_circle(int x, int y, int r, unsigned char c, bool filled);
-void draw_polygon(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, unsigned char c, bool filled);
-void draw_triangle(int x1, int y1, int x2, int y2, int x3, int y3, unsigned char c, bool filled);
+void drawPixel(short x, short y, unsigned char c);
+void drawVLine(short x, short y, short h, unsigned char color);
+void drawHLine(short x, short y, short w, unsigned char color);
+//void drawHLineFast(short startX, short y, short w, uint8_t color);
+void drawLine(short x0, short y0, short x1, short y1, char color);
+void drawLineThickness(short x0, short y0, short x1, short y1, char unsigned color, short thickness);
+void drawRect(short x, short y, short w, short h, char color);
+void drawRectThickness(short x, short y, short w, short h, char color, short thickness);
+void drawRectCenter(short x, short y, short w, short h, char color);
+void drawRectCenterThickness(short x, short y, short w, short h, char color, short thickness);
+void drawRectRotated(short x, short y, short w, short h, char color, uint8_t thickness, int transparency, short angleDeg);
+void drawRectTransparency(short x, short y, short w, short h, char color, uint8_t thickness, int transparency);
+void drawCircleHelper(short x0, short y0, short r, unsigned char cornername, char color);
+void drawCircle(short x0, short y0, short w, short h, char color, uint8_t thickness, int transparency);
+void drawCircleRotated(short x0, short y0, short w, short h, char color, uint8_t thickness, int transparency, short angleDeg);
+void fillCircle(short x0, short y0, short r, char color);
+void filledElipsisTransparency(short x0, short y0, short w, short h, char color, int transparency);
+void filledElipsisRotated(short x0, short y0, short w, short h, char color, int transparency, short angleDeg);
+void fillCircleHelper(short x0, short y0, short r, unsigned char cornername, short delta, char color);
+void drawRoundRect(short x, short y, short w, short h, short r, char color);
+void fillRoundRect(short x, short y, short w, short h, short r, char color);
+void fillRect(short x, short y, short w, short h, char color);
+void fillRectCenter(short x, short y, short w, short h, char color);
+void fillRectTransparency(short x, short y, short w, short h, char color, int transparency);
+void drawFillRectRotated(short x, short y, short w, short h, char color, int transparency, short angleDeg);
+void fillRectFast(short x, short y, short w, short h, char color);
+void drawChar(short x, short y, unsigned char c, char color, char bg, unsigned char size, short transparency);
+void drawCharCustomSize(short x, short y, unsigned char c, char color, char bg, short widthSize, short heightSize, short transparency);
+void setTextCursor(short x, short y);
+void setTextColor(char c);
+void setTextColor2(char c, char bg);
+void setTextSize(unsigned char s);
+void setTextWrap(char w);
+void tft_write(unsigned char c);
+void writeString(char* str);
+void drawImage(int xPosition, int yPosition, int targetWidth, int targetHeight, unsigned char* bitmapData, int bitmapWidth, int bitmapHeight, int color, int bgColor, bool doItFast, int transparency);
+void drawStar(short x0, short y0, short w, short h, char color, uint8_t thickness, int transparency);
+void drawPussy(short x0, short y0, short w, short h, char color, uint8_t thickness, int transparency);
 
-void swap(int *a, int *b);
-void init_line(struct Line *line, int x1, int y1, int x2, int y2);
-void step_line(struct Line *line);
+// Función para autómata de Conway
+unsigned char getPixel(short x, short y);
 
-void blit(const void * data, int sx, int sy, int sw, int sh, int dx, int dy);
+void swapNumb(short *a, short *b);
 #ifdef __cplusplus
 }
 #endif
+

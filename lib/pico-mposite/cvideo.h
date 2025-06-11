@@ -19,7 +19,7 @@
 
 // --- PAL/NTSC selectable ---
 #if VIDEO_NTSC
-#define piofreq_0 (5.2f * 2)     // NTSC sync (aprox)
+#define piofreq_0 (5.2f * 2)      // NTSC sync (aprox)
 #define piofreq_1_256 (6.30f * 2) // NTSC pixel data (aprox)
 #define piofreq_1_320 (5.04f * 2)
 #define piofreq_1_640 (2.52f * 2)
@@ -58,8 +58,8 @@
 extern unsigned char *screen_bitmap;
 extern unsigned char *screen_bitmap_next;
 
-extern int width;
-extern int height;
+extern int screenWidth;
+extern int screenHeight;
 
 #ifdef __cplusplus
 extern "C"
@@ -76,7 +76,8 @@ extern "C"
     void wait_vblank(void);
     void set_border(unsigned char colour);
     // Double buffer support
-void swap_bitmap(void);
+    void swap_video_buffer();
+
 #ifdef __cplusplus
 }
 #endif
