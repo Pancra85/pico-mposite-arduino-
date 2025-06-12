@@ -22,7 +22,7 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 pico_sdk_init()
 
-add_executable(pico-mposite main.c cvideo.c graphics.c charset.c bitmap.c terminal.c)
+add_executable(pico-mposite main.c cvideo.c graphics.c charset.c bitmaps.c terminal.c)
 
 pico_generate_pio_header(pico-mposite ${CMAKE_CURRENT_LIST_DIR}/cvideo_sync.pio)
 pico_generate_pio_header(pico-mposite ${CMAKE_CURRENT_LIST_DIR}/cvideo_data.pio)

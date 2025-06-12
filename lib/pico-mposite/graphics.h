@@ -25,9 +25,9 @@ extern const uint8_t sqrtLut[256];
 extern const int bayerMatrixMax;
 extern const int bayerMatrixSize;
 
-#define BAYER_MATRIX_SIZE 8
-extern const int bayerMatrix[BAYER_MATRIX_SIZE][BAYER_MATRIX_SIZE];
-extern const int bayerMatrixY[BAYER_MATRIX_SIZE];
+#define bayerMatrixSize 8
+extern const int bayerMatrix[bayerMatrixSize][bayerMatrixSize];
+extern const int bayerMatrixY[bayerMatrixSize];
 
 
 #ifdef __cplusplus

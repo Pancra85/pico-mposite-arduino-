@@ -11,70 +11,10 @@
 #include "hardware/irq.h"
 
 #include "main.h"
-#include "bitmap.h"
+#include "bitmaps.h"
 #include "graphics.h"
 #include "cvideo.h"
-#include "../lib/pico-mposite/ad724_clock.pio.h"
-
-// Cube corner points
-//
-int shape_pts[8][8] = {
-    {-20, 20, 20},
-    {20, 20, 20},
-    {-20, -20, 20},
-    {20, -20, 20},
-    {-20, 20, -20},
-    {20, 20, -20},
-    {-20, -20, -20},
-    {20, -20, -20},
-};
-
-// Cube polygons (lines between corners + colour)
-//
-#if opt_colour == 0
-
-int shape[6][5] = {
-    {0, 1, 3, 2, 1},
-    {6, 7, 5, 4, 2},
-    {1, 5, 7, 3, 3},
-    {2, 6, 4, 0, 4},
-    {2, 3, 7, 6, 5},
-    {0, 4, 5, 1, 6},
-};
-
-unsigned char col_mandelbrot[16] = {
-    0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
-
-#else
-
-int shape[6][5] = {
-    {0, 1, 3, 2, col_red},
-    {6, 7, 5, 4, col_green},
-    {1, 5, 7, 3, col_blue},
-    {2, 6, 4, 0, col_magenta},
-    {2, 3, 7, 6, col_cyan},
-    {0, 4, 5, 1, col_yellow},
-};
-
-unsigned char col_mandelbrot[16] = {
-    rgb(0, 0, 0),
-    rgb(1, 0, 0),
-    rgb(2, 0, 0),
-    rgb(3, 0, 0),
-    rgb(4, 0, 0),
-    rgb(5, 0, 0),
-    rgb(6, 0, 0),
-    rgb(7, 0, 0),
-    rgb(7, 0, 0),
-    rgb(7, 1, 0),
-    rgb(7, 2, 0),
-    rgb(7, 3, 0),
-    rgb(7, 4, 0),
-    rgb(7, 5, 0),
-    rgb(7, 6, 0),
-    rgb(7, 7, 0)};
-
-#endif
+#include "ad724_clock.pio.h"
 
 #if VIDEO_NTSC
 #define AD724_CLOCK_FREQ 3579545 // NTSC
@@ -97,19 +37,13 @@ void setup()
 
 void loop()
 {
-    // demo_splash();
-
-    // demo_spinny_cube();
-    // demo_mandlebrot();
-
      draw_screen_border(col_white);
     draw_random(col_white);
-    //demo_horizontal_sweep();
+
 
     wait_vblank();
     swap_video_buffer();
     clearScreen(0);
-    //cls(0);
 }
 
 
@@ -149,7 +83,9 @@ void draw_random(unsigned char color)
     //drawRectThickness(x, y, w, h, color,5);
     // drawHLine(x,y+10,w,col_white);
     // drawVLine(x+w,y+10,h,col_white);
-    //drawRectThickness(x,y,w,h,col_white,10);
-    drawRect(x,y,w,h,col_white);
-    sleep_ms(2000);
+    //drawRectThickness(x,y,w,h,col_white,1);
+    drawFillRectRotated(x,y,w,h,col_white,255,random(0,360));
+    //drawRectCenter(x,y,w,h,col_white);
+    //drawRect(x,y,w,h,col_white);
+    //sleep_ms(2000);
 }

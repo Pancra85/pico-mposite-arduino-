@@ -17,17 +17,17 @@
 
 #include "config.h"
 
-// --- PAL/NTSC selectable ---
+// --- velocidad de pixeles RGB lineales ---
 #if VIDEO_NTSC
-#define piofreq_0 (5.2f * 2)      // NTSC sync (aprox)
-#define piofreq_1_256 (6.30f * 2) // NTSC pixel data (aprox)
-#define piofreq_1_320 (5.04f * 2)
-#define piofreq_1_640 (2.52f * 2)
+#define piofreq_0 (5.45f * 2)      // NTSC sync
+#define piofreq_1_256 (8.30f * 2)  //resolucion no usada
+#define piofreq_1_320 (7.0f * 2) // NTSC pixel data
+#define piofreq_1_640 (2.52f * 2)  //resolucion no usada
 #else
-#define piofreq_0 (5.23f * 2)     // PAL sync
-#define piofreq_1_256 (6.00f * 2) // PAL pixel data
-#define piofreq_1_320 (6.70f * 2)
-#define piofreq_1_640 (2.80f * 2)
+#define piofreq_0 (5.25f * 2)     // PAL sync
+#define piofreq_1_256 (6.00f * 2) //resolucion no usada
+#define piofreq_1_320 (6.70f * 2)// PAL pixel data
+#define piofreq_1_640 (2.80f * 2) //resolucion no usada
 #endif
 
 #define sm_sync 0 // State machine number in the PIO for the sync data

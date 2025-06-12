@@ -1,23 +1,3 @@
-//
-// Title:	        Pico-mposite Video Output
-// Description:		The composite video stuff
-// Author:	        Dean Belfield
-// Created:	        26/01/2021
-// Last Updated:	27/09/2024
-//
-// Modinfo:
-// 15/02/2021:      Border buffers now have horizontal sync pulse set correctly
-//                  Decreased RAM usage by updating the image buffer scanline on the fly during the horizontal interrupt
-//					Fixed logic error in cvideo_dma_handler; initial memcpy done twice
-// 31/01/2022:      Refactored to use less memory
-//					Split the video generation into two state machines; sync and data
-// 01/02/2022:      Added a handful of graphics primitives
-// 02/02/2022:      Split main loop out into main.c
-// 04/02/2022:      Added set_border
-// 05/02/2022:      Added support for colour, fixed bug in video generation
-// 20/02/2022:      Bitmap is now dynamically allocated; added two higher resolution video modes
-// 25/02/2022:      Lengthened HSYNC to 12us
-// 27/09/2024:		PIO state machines now started simultaneously
 #include <Arduino.h>
 #include <stdlib.h>
 
@@ -64,6 +44,19 @@
 int screenWidth = 320;
 int screenHeight = 240;
 
+#if VIDEO_NTSC
+int ntsc_field = 0; // 0: even, 1: odd
+#endif
+
+#if VIDEO_NTSC
+unsigned short hsync[HSYNC_TABLE_SIZE] = {
+    HSLO, HSLO, HSHI, HSHI, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, BORD};
+#else //para PAL:
 unsigned short hsync[HSYNC_TABLE_SIZE] = {
     HSLO, HSLO, HSHI, HSHI, HSHI, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -71,6 +64,7 @@ unsigned short hsync[HSYNC_TABLE_SIZE] = {
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
     0x00, BORD};
+    #endif
 
 unsigned short border[HSYNC_TABLE_SIZE] = {
     HSLO, HSLO, HSHI, HSHI, HSHI, HSHI, BORD, // sync pulses + 1 borde izq

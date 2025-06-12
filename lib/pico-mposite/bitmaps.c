@@ -13,12 +13,12 @@
 // The colour bitmap is an array of pixels, where each pixel is an RGB value, with the bits being arranged as RRRGGGBB
 //
 // Modinfo:
-// 01/02/2022:      Renamed sample_bitmap, made a const, moved to bitmap.c
+// 01/02/2022:      Renamed sample_bitmap, made a const, moved to bitmaps.c
 // 08/02/2022:      Added colour bitmap
 // 20/02/2022:      Removed reference to graphics.h
 // 01/03/2022:      Fixed colour bitmap
 #include <Arduino.h>
-#include "bitmap.h"
+#include "bitmaps.h"
 
 short MAX_BITMAPS = 3; //cuantas imagenes hay (si se agregan mas, cambiar el valor manualmente)
 

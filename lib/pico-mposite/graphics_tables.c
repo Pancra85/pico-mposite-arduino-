@@ -149,7 +149,8 @@ const short cosLut[360] = {
     254, 254, 255, 255, 256, 256, 256, 256, 256, 256};
 
     // Define the Bayer 8x8 matrix (for dithering)
-const int bayerMatrix[BAYER_MATRIX_SIZE][BAYER_MATRIX_SIZE] = {
+const int bayerMatrixMax = 63; // numero maximo de la matriz
+const int bayerMatrix[bayerMatrixSize][bayerMatrixSize] = {
     {0, 32, 8, 40, 2, 34, 10, 42},
     {48, 16, 56, 24, 50, 18, 58, 26},
     {12, 44, 4, 36, 14, 46, 6, 38},
@@ -159,4 +160,4 @@ const int bayerMatrix[BAYER_MATRIX_SIZE][BAYER_MATRIX_SIZE] = {
     {15, 47, 7, 39, 13, 45, 5, 37},
     {63, 31, 55, 23, 61, 29, 53, 21}};
 
-const int bayerMatrixY[BAYER_MATRIX_SIZE] = {54, 18, 36, 0, 63, 27, 45, 9};
+const int bayerMatrixY[bayerMatrixSize] = {54, 18, 36, 0, 63, 27, 45, 9};
